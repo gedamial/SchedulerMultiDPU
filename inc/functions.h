@@ -18,14 +18,26 @@ float computeEtot(const Matrix<bool>& S);
 
 std::vector<std::string> Explode(std::string str, std::string delim);
 
-inline void PrintMatrix(const Matrix<bool>& mat)
+template<typename T>
+inline void PrintMatrix(const Matrix<T>& mat, std::ostream& os)
 {
     for (const auto& row : mat)
     {
         for (const auto& col : row)
-            std::cout << col << " ";
-        std::cout << std::endl;
+            os << col << " ";
+        os << std::endl;
     }
+
+    os << std::endl;
+}
+
+template<typename T>
+inline void PrintVector(const std::vector<T>& vec, std::ostream& os)
+{
+    for (const T& elem : vec)
+        os << elem << " ";
+
+    os << std::endl;
 }
 
 #endif

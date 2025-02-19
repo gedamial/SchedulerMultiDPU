@@ -117,13 +117,18 @@ int main(int argc, char** argv)
     const size_t repetitions = atoi(argv[3]);
 
     // OUTPUT FILES
-    std::ofstream output_file_total("../files/output/schedule_output_total.txt", std::ios::out | std::ios::trunc);
-    std::ofstream output_file_dpu("../files/output/schedule_output_dpu.txt", std::ios::out | std::ios::trunc);
-    std::ofstream output_file_idleEnergy("../files/output/schedule_output_idleEnergy.txt", std::ios::out | std::ios::trunc);
+    std::ofstream output_file_total("../files/output/schedule_output_total.txt", std::ios::trunc);
+    std::ofstream output_file_dpu("../files/output/schedule_output_dpu.txt", std::ios::trunc);
+    std::ofstream output_file_idleEnergy("../files/output/schedule_output_idleEnergy.txt", std::ios::trunc);
+    std::ofstream output_file_allocMatrix("../files/output/schedule_output_allocation.txt", std::ios::trunc);
+    std::ofstream output_file_shuffles("../files/output/schedule_output_shuffles.txt", std::ios::trunc);
+
 
     for(int i = 0; i < repetitions; ++i)
     {
         auto t1 = std::chrono::high_resolution_clock::now();
+    
+        std::cout << "Repetition #" << i+1 << std::endl;
 
         // BEGIN scheduling
 
@@ -132,9 +137,8 @@ int main(int argc, char** argv)
         std::shuffle(workloads.begin(), workloads.end(), g);
 
         std::cout << "Workloads array after shuffling:" << std::endl;
-        for(int i = 0; i < numWorkloads; ++i)
-            std::cout << workloads[i] << " ";
-        std::cout << std::endl;
+        PrintVector(workloads, std::cout);
+        PrintVector(workloads, output_file_shuffles);
 
         Matrix<bool> S;
         S.resize(numDPUs);
@@ -171,7 +175,8 @@ int main(int argc, char** argv)
 
         std::cout << "Scheduler runtime: " << us.count() << "us" << std::endl;
 
-        PrintMatrix(S);
+        PrintMatrix(S, std::cout);
+        PrintMatrix(S, output_file_allocMatrix);
 
         // Print runtime and energy for each DPU
         for(int i = 0; i < numDPUs; ++i)
@@ -194,6 +199,8 @@ int main(int argc, char** argv)
         std::cout << "Etot = " << Etot << "mJ" <<  std::endl;
 
         output_file_total << std::fixed << std::setprecision(3) << Ttot << "," << Etot << "\n";
+
+        std::cout << std::endl << std::endl << std::endl;
     }
 
     return 0;
